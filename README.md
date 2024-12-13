@@ -1,6 +1,6 @@
 # Mithril Weather Generator for Traveller RPG
 
-This script generates dynamic and thematic weather for the planet [Mithril](https://wiki.travellerrpg.com/Mithril_(world)) in the Traveller RPG setting. It follows the rules outlined in Mongoose's [Marches Adventure 2: Mission To Mithril](https://www.mongoosepublishing.com/products/marches-adventure-2-mission-to-mithril). The script simulates weather conditions based on zones, precipitation patterns, and time since the last storm. Feel free to use this or modify it as you see fit.
+This script generates dynamic and thematic weather for the planet <a href="https://wiki.travellerrpg.com/Mithril_(world)" target="_blank">Mithril</a> in the Traveller RPG setting. It follows the rules outlined in Mongoose's <a href="https://www.mongoosepublishing.com/products/marches-adventure-2-mission-to-mithril" target="_blank">Marches Adventure 2: Mission To Mithril</a>. The script simulates weather conditions based on zones, precipitation patterns, and time since the last storm. Feel free to use this or modify it as you see fit.
 
 
 ## Requirements
