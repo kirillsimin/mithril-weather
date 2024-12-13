@@ -91,7 +91,7 @@ def get_zone():
         print("\n\nSafe Travels!")
         sys.exit()
     except:
-        return 1
+        return 0
 
 if __name__ == "__main__":
     days_since_storm = get_days_since()
