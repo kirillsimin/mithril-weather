@@ -12,6 +12,8 @@ This script generates dynamic and thematic weather for the planet <a href="https
 ## Usage
 
 1. Clone or download this repository to your local machine.
+   - Optionally, you can use an online tool such as https://www.online-python.com/
+
 2. Run the script using a terminal or command prompt:
    ```bash
    python weather.py
