@@ -5,7 +5,22 @@ This script generates dynamic and thematic weather for the planet <a href="https
 ![cold-planet](https://github.com/user-attachments/assets/018f05a0-7996-41e3-a842-b4ba2418abdc)
 
 
-## Requirements
+##  HTML/JavaScript Web Simulator
+
+1. Clone or download this repository to your local machine.
+- Open the provided HTML file (e.g., index.html or the file you saved) in a web browser.
+2. In the browser interface:
+- Enter the number of days since the last storm.
+- Select a zone from the dropdown.
+- Click Simulate Weather to generate weather conditions.
+3. The simulator will display:
+- A detailed weather description.
+- Precipitation type and intensity.
+- A log of previous simulations, with the newest weather events at the top.
+
+No additional software or server is required—simply open the HTML file in a modern web browser to start using the simulator.
+
+## Requirements for Python Script
 
 - **Python Version**: Python 3.8 or higher.
 
