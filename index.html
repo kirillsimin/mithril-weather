@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mithril Weather Simulator</title>
+  <!-- Google Font for sci-fi style -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    html {
+      /* Apply gradient to the entire page, fixed and no-repeat */
+      background: linear-gradient(to bottom, #001f3f, #000814) no-repeat fixed;
+      background-size: 100% 100%;
+      min-height: 100%;
+    }
+    body {
+      margin: 0;
+      color: #0ff;
+      font-family: 'Orbitron', sans-serif;
+      padding: 20px;
+      /* Transparent background to reveal html gradient */
+      background: transparent;
+    }
+    input, select, button {
+      background-color: #002e5d;
+      color: #0ff;
+      border: 1px solid #0ff;
+      padding: 5px;
+      font-family: inherit;
+      margin: 5px 0;
+    }
+    button:hover {
+      background-color: #0ff;
+      color: #001f3f;
+      cursor: pointer;
+    }
+    .output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      border: 1px solid #0ff;
+      padding: 10px;
+      background-color: #00122e;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .logEntry {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #0ff;
+      padding-bottom: 10px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2em;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mithril Weather Simulator</h1>
+  <p>Enter the days since the last storm and select a zone to simulate weather conditions on the Traveller RPG planet Mithril.</p>
+
+  <label for="daysInput">Days since last storm:</label>
+  <input type="number" id="daysInput" value="0" min="0">
+
+  <label for="zoneSelect">Choose a zone:</label>
+  <select id="zoneSelect"></select>
+
+  <br>
+  <button id="simulateBtn">Simulate Weather</button>
+
+  <div class="output" id="logContainer"></div>
+
+  <script>
+    const ZONES = ["Snow Zone", "Ice Zone", "Arctic Zone"];
+    const ZONE_MODIFIERS = [0, -2, -4];
+    const WEATHER_CONDITIONS = [
+      "Extremely Cold. -50°C and below. Snowfall unlikely. Strong winds common with small ice particles.",
+      "Very Cold. -20°C to -40°C. Too cold for much snowfall unless storm.",
+      "Cold. -10°C. Snowfall or hail is common, and can last for several hours.",
+      "Cool. 0-4°C. An Ephemeral Glade is possible in areas with thin snow cover. Snowfall or hail likely but intermittent",
+      "Warm. 4-8°C, rarely 10°C. Melting of thinner ice. Ephemeral Glade is likely. Some rain or sleet likely."
+    ];
+
+    function roll2d6() {
+      return (Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1);
+    }
+
+    function get_conditions(days_since_storm, zone_id) {
+      let roll = roll2d6();
+      if(zone_id === 0) return roll;
+      let dm = days_since_storm === 1 ? -4 : 0;
+      dm += ZONE_MODIFIERS[zone_id];
+      return roll + dm;
+    }
+
+    function get_condition_category(condition_roll) {
+      if(condition_roll <= 2) return 0;
+      else if(condition_roll <= 5) return 1;
+      else if(condition_roll <= 9) return 2;
+      else if(condition_roll <= 11) return 3;
+      else return 4;
+    }
+
+    function get_percipitation(days_since_storm, large_change_yesterday) {
+      if(large_change_yesterday && roll2d6() >= 8) {
+        return 13;
+      }
+      return roll2d6() + days_since_storm;
+    }
+
+    function get_percipitation_description(precipitation, weather_condition) {
+      if(precipitation < 7) {
+        return "No precipitation. Overcast or clear sky.";
+      }
+      if(precipitation >= 13) {
+        let lightning = (Math.floor(Math.random() * 6)+1) === 6;
+        let length = roll2d6();
+        let description = "Storm " + length + " hours! Strong gusty winds that blow snow into deep drifts, driving hail or snow, and heavy precipitation. Visibility reduced to almost nothing.";
+        if(lightning) description += "\nRepeated spectacular lightning strikes!";
+        return description;
+      }
+      if(weather_condition <= 9) {
+        let options = ["Snow.", "Hail."];
+        return options[Math.floor(Math.random() * options.length)];
+      } else if(weather_condition <= 11) {
+        let options = ["Sleet.", "Hail."];
+        return options[Math.floor(Math.random() * options.length)];
+      } else {
+        return "Rain.";
+      }
+    }
+
+    function get_large_change(condition_categories) {
+      if(condition_categories.length >= 3) {
+        return (condition_categories[condition_categories.length - 2] -
+                condition_categories[condition_categories.length - 3] >= 2);
+      } else {
+        return false;
+      }
+    }
+
+    let condition_categories = [];
+    let percipitations = [];
+    let days_since_storm = 0;
+
+    function populateZones() {
+      const zoneSelect = document.getElementById('zoneSelect');
+      ZONES.forEach((zone, index) => {
+        const opt = document.createElement('option');
+        opt.value = index;
+        opt.text = zone;
+        zoneSelect.add(opt);
+      });
+    }
+
+    function simulateWeather() {
+      // Get days_since_storm from input on first run or as updated by simulation
+      let daysInputValue = document.getElementById('daysInput').value;
+      days_since_storm = parseInt(daysInputValue) || days_since_storm;
+
+      let zone_id = parseInt(document.getElementById('zoneSelect').value);
+      let conditions = get_conditions(days_since_storm, zone_id);
+      let condition_category = get_condition_category(conditions);
+      condition_categories.push(condition_category);
+
+      let large_change = get_large_change(condition_categories);
+      let perc = get_percipitation(days_since_storm, large_change);
+      percipitations.push(perc);
+
+      let output = "";
+      output += WEATHER_CONDITIONS[condition_category] + "\n";
+      output += get_percipitation_description(perc, condition_category) + "\n";
+
+      // Create a new log entry and prepend to the log container
+      let logContainer = document.getElementById('logContainer');
+      let newEntry = document.createElement('div');
+      newEntry.classList.add("logEntry");
+      newEntry.textContent = output;
+      logContainer.prepend(newEntry);
+
+      // Update days_since_storm for subsequent simulations
+      days_since_storm = (perc >= 13) ? 0 : days_since_storm + 1;
+      document.getElementById('daysInput').value = days_since_storm;
+    }
+
+    document.getElementById('simulateBtn').addEventListener('click', simulateWeather);
+    populateZones();
+  </script>
+</body>
+</html>
